@@ -5,7 +5,6 @@
 name: 'product_analytics_abuse_detection'
 version: '1.0.0'
 config-version: 2
-
 # This setting configures which "profile" dbt uses for this project.
 profile: 'product_analytics_abuse_detection'
 
