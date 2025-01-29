@@ -1,3 +1,13 @@
+{{
+ config(
+   materialized = 'table',
+   partition_by = {
+     'timestamp':'day'
+   }
+ )
+}}
+
+
 with Primary_event as
 (SELECT 
 SESSION_ID as sessionId,
@@ -13,10 +23,12 @@ JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'userguid') AS userguid,
 JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'sessionSource') AS sessionSource,
 JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'ZBNumber') AS ZBNumber,
 JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'username') AS username,
-JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'ContactNumber') AS ContactNumber
+JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'ContactNumber') AS ContactNumber,
+timestamp
 FROM "PROD"."SOURCE"."COBALT_CARSWELL_WESTLAW" 
 where EVENT_NAME ='Cobalt.Website.Delivery.SessionStart'
-and TO_DATE(LEFT(timestamp, 10), 'yyyy-mm-dd') >=(select dateadd(year, -1, current_date) from dual))
+and TO_DATE(LEFT(timestamp, 10), 'yyyy-mm-dd') >='2024-01-01')
+--(select dateadd(year, -1, current_date) from dual))
 --and ONLINESESSIONID='6279143d4aa84a67b598c32aaf824e58')
 ,
 Seconday_event as 
@@ -42,7 +54,8 @@ JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'emailAddressCount') AS emailAddressCount,
 JSON_EXTRACT_PATH_TEXT(EVENT_DATA, 'emailAddresses') AS emailAddresses
 FROM "PROD"."SOURCE"."COBALT_CARSWELL_WESTLAW" 
 where EVENT_NAME ='Cobalt.Website.DocumentDelivery.Complete' 
-and TO_DATE(LEFT(timestamp, 10), 'yyyy-mm-dd') >=(select dateadd(year, -1, current_date) from dual))
+and TO_DATE(LEFT(timestamp, 10), 'yyyy-mm-dd') >='2024-01-01')
+--(select dateadd(year, -1, current_date) from dual))
 --and ONLINESESSIONID='6279143d4aa84a67b598c32aaf824e58')
 
 select distinct Primary_event.*,
